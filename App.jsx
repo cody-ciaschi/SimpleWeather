@@ -1,5 +1,6 @@
 const {useState, useEffect} = React;
 const APIKEY = "";
+const {Form, Button, Container} = ReactBootstrap;
 
 let DataSection = ({data}) => {
 	let temperature = {...data.Temperature}.Imperial;
@@ -15,11 +16,11 @@ let DataSection = ({data}) => {
 			Humidity: {data.RelativeHumidity}% <br/>
 			Wind Speed:	{{...windSpeed}.Value} mph<br/>
 			Wind Direction:	{{...windDir}.Localized}<br/>
-			Link for more information: <a href={data.Link}>Weather</a>
+			<a href={data.Link}>Click for more information</a>
 			</p>
 		</div>
 	);
-}
+};
 
 let useDataApi = (initialUrl, initialData) => {
 	const [data, setData] = useState(initialData);
@@ -40,29 +41,30 @@ let useDataApi = (initialUrl, initialData) => {
 	}, [locUrl]);
 
 	return [data, setLocUrl];
-}
+};
 
 let App = () => {
 	const [zipcode, setZipCode] = useState("20910");
 	const [data, fetchData] = useDataApi(`http://dataservice.accuweather.com/locations/v1/postalcodes/search?apikey=${APIKEY}&q=20910`, {});
 	
 	return(
-		<>
-			<form onSubmit={e => {
+		<Container>
+			<h1 className="text-center">Find the Current Weather</h1>
+			<Form onSubmit={e => {
 				fetchData(`http://dataservice.accuweather.com/locations/v1/postalcodes/search?apikey=${APIKEY}&q=${zipcode}`);
 				e.preventDefault();
 			}}>
-				<label>
-					Zip / Postal Code: 
-					<input type="text" name="zipcode" id="zipcode" onChange={e => setZipCode(e.target.value)}/>
-				</label>
-				<button type="submit">Search</button>
-			</form>
+				<Form.Group className="mb-3">
+					<Form.Label>Zip / Postal Code</Form.Label>
+					<Form.Control onChange={e => setZipCode(e.target.value)} placeholder="ex. 20910"/>
+				</Form.Group>
+				<Button type="submit">Search</Button>
+			</Form>
 			<hr></hr>
-			<h1>Weather for {zipcode}</h1>
-			<DataSection data={data} />
-		</>
+				<h1>Weather for {zipcode}</h1>
+				<DataSection data={data} />
+		</Container>
 	);
-}
+};
 
 ReactDOM.render(<App />, document.getElementById("root"));
